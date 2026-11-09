@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <link rel="icon" type="image/png" href="icon.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FinTask</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#fff;font-family:Arial}
+header{padding:25px;background:linear-gradient(135deg,#713cff,#00c4dd);border-radius:0 0 25px 25px}
+header h1{margin:0}
+header p{margin-bottom:0}
+main{max-width:900px;margin:auto;padding:15px}
+nav{display:flex;gap:7px;overflow:auto;margin:15px 0}
+nav button{background:#202b43;color:white;border:0;padding:12px;border-radius:12px;white-space:nowrap}
+nav button.active{background:#7447ff}
+.card{background:#151d31;padding:17px;border-radius:17px;margin-bottom:14px;border:1px solid #26334f}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#202b43;padding:15px;border-radius:12px}
+.stat h2{color:#9a85ff;margin-bottom:0}
+input,textarea,select{width:100%;padding:13px;margin:7px 0;background:#0c1428;color:white;border:1px solid #35415c;border-radius:10px;font-size:15px}
+button.action{background:#7047ff;color:white;border:0;border-radius:10px;padding:12px;margin:5px 2px;cursor:pointer}
+button.red{background:#d94358}
+button.green{background:#148c70}
+.item{background:#202b43;padding:13px;border-radius:12px;margin:8px 0;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hidden{display:none}
+.progress{height:9px;background:#303b54;border-radius:10px;margin:10px 0}
+.progress div{height:100%;background:#8c6bff;border-radius:10px}
+.chat{height:300px;overflow:auto;background:#0c1428;padding:12px;border-radius:12px}
+.msg{padding:12px;margin:8px 0;border-radius:12px;white-space:pre-wrap}
+.user{background:#6441ca;margin-left:15%}
+.bot{background:#26334c;margin-right:10%}
+small{color:#aab7d5}
+</style>
+</head>
+<body>
+<header>
+<h1>✨ FinTask</h1>
+<p>Finance • Tasks • Study • AI Helper</p>
+</header>
+<main>
+
+<nav>
+<button class="active" onclick="page('home',this)">🏠 Home</button>
+<button onclick="page('finance',this)">💰 Finance</button>
+<button onclick="page('todo',this)">✅ To-Do</button>
+<button onclick="page('study',this)">📚 Study</button>
+<button onclick="page('ai',this)">🤖 AI Helper</button>
+<button onclick="page('profile',this)">👤 Profile</button>
+</nav>
+
+<section id="home">
+<div class="card"><h2 id="welcome">Welcome to FinTask 👋</h2><p>Apna daily life manage karo.</p></div>
+<div class="grid">
+<div class="stat"><small>Total Expenses</small><h2 id="hSpent">₹0</h2></div>
+<div class="stat"><small>Budget Left</small><h2 id="hLeft">₹0</h2></div>
+<div class="stat"><small>Pending Tasks</small><h2 id="hTask">0</h2></div>
+<div class="stat"><small>Study Progress</small><h2 id="hStudy">0%</h2></div>
+</div>
+<div class="card">
+<h3>Quick Actions</h3>
+<button class="action" onclick="page('finance')">+ Expense</button>
+<button class="action" onclick="page('todo')">+ Task</button>
+<button class="action" onclick="page('study')">+ Topic</button>
+<button class="action" onclick="page('ai')">Ask AI</button>
+</div>
+</section>
+
+<section id="finance" class="hidden">
+<div class="card">
+<h2>💰 Finance Manager</h2>
+<input id="budget" type="number" placeholder="Monthly Budget ₹">
+<button class="action" onclick="setBudget()">Save Budget</button>
+<div class="grid">
+<div class="stat"><small>Total Spent</small><h2 id="spent">₹0</h2></div>
+<div class="stat"><small>Remaining</small><h2 id="left">₹0</h2></div>
+</div>
+</div>
+<div class="card">
+<h3>Add Expense</h3>
+<input id="expText" placeholder="20 rupaye ka samosa khaya">
+<input id="expAmount" type="number" placeholder="Amount ₹ (optional)">
+<select id="expCat">
+<option>Auto</option><option>Food</option><option>Grocery</option>
+<option>Education</option><option>Gadgets</option>
+<option>Transport</option><option>Shopping</option><option>Bills</option><option>Other</option>
+</select>
+<button class="action" onclick="addExpense()">Add Expense</button>
+</div>
+<div class="card"><h3>History</h3><div id="expList"></div></div>
+</section>
+
+<section id="todo" class="hidden">
+<div class="card">
+<h2>✅ To-Do</h2>
+<input id="task" placeholder="Task name">
+<input id="taskDate" type="date">
+<button class="action" onclick="addTask()">Add Task</button>
+</div>
+<div class="card"><h3>Tasks</h3><div id="taskList"></div></div>
+</section>
+
+<section id="study" class="hidden">
+<div class="card">
+<h2>📚 Study Planner</h2>
+<input id="subject" placeholder="Subject">
+<input id="topic" placeholder="Topic / Chapter">
+<button class="action" onclick="addTopic()">Add Topic</button>
+</div>
+<div class="card">
+<h3>Progress</h3>
+<div class="progress"><div id="bar" style="width:0"></div></div>
+<p id="percent">0%</p>
+</div>
+<div class="card"><h3>Topics</h3><div id="topicList"></div></div>
+</section>
+
+<section id="ai" class="hidden">
+<div class="card">
+<h2>🤖 FinTask Basic AI</h2>
+<p>Maths, Physics, Chemistry, Finance aur Planner helper.</p>
+<small>Offline basic assistant • Limited answers</small>
+</div>
+<div class="card">
+<div class="chat" id="chat">
+<div class="msg bot">Namaste! 👋
+Main FinTask Basic AI hoon.
+Maths, Physics, Chemistry, Finance ya Planner ka doubt poochho.</div>
+</div>
+<input id="question" placeholder="Apna doubt likho..." onkeydown="if(event.key==='Enter')askAI()">
+<button class="action" onclick="askAI()">Send ➤</button>
+<button class="action red" onclick="clearChat()">Clear Chat</button>
+</div>
+<div class="card">
+<h3>Planner Generator</h3>
+<input id="hours" type="number" placeholder="Kitne hours available hain?">
+<input id="plannerSubjects" placeholder="Subjects (Physics, Maths, Chemistry)">
+<button class="action" onclick="makePlanner()">Create Study Planner</button>
+<div id="plannerResult"></div>
+</div>
+</section>
+
+<section id="profile" class="hidden">
+<div class="card">
+<h2>👤 Profile</h2>
+<input id="name" placeholder="Your name">
+<button class="action" onclick="saveName()">Save Name</button>
+<button class="action" onclick="changeTheme('#0b1020')">Dark Theme</button>
+<button class="action" onclick="changeTheme('#101c35')">Blue Theme</button>
+</div>
+<div class="card">
+<h3>📱 Mobile Usage</h3>
+<p>Actual screen time ke liye Android native permission aur integration chahiye.</p>
+</div>
+<div class="card">
+<button class="action red" onclick="resetData()">Reset All Data</button>
+</div>
+</section>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const get=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}};
+let expenses=get("expenses",[]),tasks=get("tasks",[]),topics=get("topics",[]);
+let budget=get("budget",0),username=get("username","");
+let chatHistory=get("chatHistory",[]);
+
+function save(){
+localStorage.setItem("expenses",JSON.stringify(expenses));
+localStorage.setItem("tasks",JSON.stringify(tasks));
+localStorage.setItem("topics",JSON.stringify(topics));
+localStorage.setItem("budget",JSON.stringify(budget));
+}
+function page(id,btn){
+document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+$(id).classList.remove("hidden");
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+if(btn)btn.classList.add("active");
+render();
+}
+function money(n){return "₹"+Number(n||0).toLocaleString("en-IN")}
+function setBudget(){budget=Math.max(0,Number($("budget").value)||0);save();render()}
+function category(t){
+t=t.toLowerCase();
+if(/samosa|food|khana|chai|coffee|pizza|burger|snack|restaurant/.test(t))return "Food";
+if(/sabzi|vegetable|chilli|chili|grocery|kirana|atta|rice|dal|milk|doodh/.test(t))return "Grocery";
+if(/book|copy|pen|school|physics|chemistry|math|study/.test(t))return "Education";
+if(/phone|mobile|laptop|charger|earphone/.test(t))return "Gadgets";
+if(/bus|auto|petrol|train|taxi/.test(t))return "Transport";
+if(/shirt|shoes|shopping|dress/.test(t))return "Shopping";
+if(/bill|recharge|electricity|wifi/.test(t))return "Bills";
+return "Other";
+}
+function addExpense(){
+let text=$("expText").value.trim(),amount=Number($("expAmount").value);
+if(!text)return alert("Description likho");
+if(!amount){
+let m=text.match(/(?:₹|rs\.?|rupees?|rupaye?)\s*(\d+(?:\.\d+)?)/i)||text.match(/(\d+(?:\.\d+)?)\s*(?:₹|rs\.?|rupees?|rupaye?)/i);
+if(m)amount=Number(m[1]);
+}
+if(!amount)return alert("Amount likho");
+let c=$("expCat").value;
+expenses.unshift({id:Date.now(),text,amount,cat:c==="Auto"?category(text):c,date:new Date().toLocaleDateString("en-IN")});
+$("expText").value="";$("expAmount").value="";
+save();render();
+}
+function delExpense(id){expenses=expenses.filter(e=>e.id!==id);save();render()}
+function addTask(){
+let text=$("task").value.trim();if(!text)return alert("Task likho");
+tasks.unshift({id:Date.now(),text,date:$("taskDate").value,done:false});
+$("task").value="";save();render();
+}
+function toggleTask(id){tasks=tasks.map(t=>t.id===id?{...t,done:!t.done}:t);save();render()}
+function delTask(id){tasks=tasks.filter(t=>t.id!==id);save();render()}
+function addTopic(){
+let s=$("subject").value.trim(),t=$("topic").value.trim();
+if(!s||!t)return alert("Subject aur topic likho");
+topics.unshift({id:Date.now(),s,t,done:false});
+$("topic").value="";save();render();
+}
+function toggleTopic(id){topics=topics.map(t=>t.id===id?{...t,done:!t.done}:t);save();render()}
+function delTopic(id){topics=topics.filter(t=>t.id!==id);save();render()}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function render(){
+let total=expenses.reduce((a,e)=>a+e.amount,0);
+$("budget").value=budget||"";
+$("spent").textContent=money(total);$("left").textContent=money(budget-total);
+$("hSpent").textContent=money(total);$("hLeft").textContent=money(budget-total);
+$("hTask").textContent=tasks.filter(t=>!t.done).length;
+let p=topics.length?Math.round(topics.filter(t=>t.done).length/topics.length*100):0;
+$("hStudy").textContent=p+"%";$("bar").style.width=p+"%";$("percent").textContent=p+"% Completed";
+$("welcome").textContent="Welcome "+(username||"to FinTask")+" 👋";
+$("name").value=username;
+$("expList").innerHTML=expenses.map(e=>`<div class="item"><div><b>${esc(e.text)}</b><br><small>${esc(e.cat)} • ${esc(e.date)}</small><br>${money(e.amount)}</div><button class="action red" onclick="delExpense(${e.id})">Delete</button></div>`).join("")||"No expenses";
+$("taskList").innerHTML=tasks.map(t=>`<div class="item"><span style="${t.done?'text-decoration:line-through':''}">${esc(t.text)}<br><small>${esc(t.date||"No date")}</small></span><div><button class="action green" onclick="toggleTask(${t.id})">${t.done?"Undo":"Done"}</button><button class="action red" onclick="delTask(${t.id})">Delete</button></div></div>`).join("")||"No tasks";
+$("topicList").innerHTML=topics.map(t=>`<div class="item"><span><b>${esc(t.s)}</b><br>${esc(t.t)}</span><div><button class="action green" onclick="toggleTopic(${t.id})">${t.done?"Undo":"Done"}</button><button class="action red" onclick="delTopic(${t.id})">Delete</button></div></div>`).join("")||"No topics";
+}
+function saveName(){username=$("name").value.trim();localStorage.setItem("username",JSON.stringify(username));render();alert("Name saved")}
+function changeTheme(c){document.body.style.background=c;localStorage.setItem("theme",c)}
+function resetData(){if(confirm("Saara data delete karna hai?")){localStorage.clear();location.reload()}}
+
+/* BASIC OFFLINE AI */
+function addChat(text,type){
+let d=document.createElement("div");d.className="msg "+type;d.textContent=text;
+$("chat").appendChild(d);$("chat").scrollTop=$("chat").scrollHeight;
+}
+function askAI(){
+let q=$("question").value.trim();if(!q)return;
+addChat(q,"user");$("question").value="";
+let a=answer(q);
+setTimeout(()=>addChat(a,"bot"),200);
+}
+function answer(q){
+let x=q.toLowerCase();
+
+/* Simple linear equation */
+let m=x.match(/(-?\d*)x\s*([+-]\s*\d+)?\s*=\s*(-?\d+)/);
+if(m){
+let a=m[1]===""||m[1]==="-"?(m[1]==="-"?-1:1):Number(m[1]);
+let b=Number((m[2]||"0").replace(/\s/g,""));
+let c=Number(m[3]);
+if(a!==0)return `Equation: ${q}\n${a}x ${b>=0?"+ "+b:"- "+Math.abs(b)} = ${c}\n${a}x = ${c-b}\nx = (${c-b})/${a}\nx = ${(c-b)/a}`;
+}
+if(/2\s*\+\s*2|2 plus 2/.test(x))return "2 + 2 = 4 😊";
+if(/ohm|ओम/.test(x))return "Ohm's Law:\nV = IR\nV = Voltage (Volt)\nI = Current (Ampere)\nR = Resistance (Ohm)\nExample: I=2A, R=5Ω → V=10V";
+if(/newton|न्यूटन/.test(x))return "Newton's Second Law:\nF = ma\nForce = mass × acceleration\nSI Unit: Newton (N)";
+if(/kinetic energy|गतिज ऊर्जा/.test(x))return "Kinetic Energy:\nKE = ½mv²\nm = mass (kg), v = velocity (m/s)";
+if(/potential energy|स्थितिज ऊर्जा/.test(x))return "Potential Energy:\nPE = mgh";
+if(/speed|चाल/.test(x))return "Speed = Distance / Time";
+if(/budget|finance|saving|बजट|बचत/.test(x))return "Budget Tip:\n1. Monthly budget set karo.\n2. Expenses ko category mein likho.\n3. Total spent ko budget se compare karo.\n4. Emergency saving ke liye kuch amount rakho.";
+if(/planner|study plan|पढ़ाई|schedule/.test(x))return "Study Planner Tip:\n1. Difficult subject pehle.\n2. 45-50 minute study + 5-10 minute break.\n3. Har session ke baad 5 questions practice.\n4. End mein revision.";
+if(/food|khana|samosa/.test(x))return "Food expense ko Finance section mein add karo. Description mein '20 rupaye samosa' likhne par amount aur category auto detect ho sakti hai.";
+if(/hello|hi|namaste/.test(x))return "Namaste! 👋 Maths, Physics, Chemistry, Finance ya Study Planner ka doubt poochho.";
+if(/chemistry|रसायन/.test(x))return "Chemistry mein concept, reaction aur formula samajhne ke liye chapter ka naam aur exact question likho. Offline helper limited hai.";
+if(/physics|भौतिक/.test(x))return "Physics mein formula, units aur numerical ke liye chapter aur question likho. Main supported formulas bata sakta hoon.";
+if(/math|गणित|solve/.test(x))return "Maths question poora likho. Basic linear equation jaise 2x+5=15 solve kar sakta hoon.";
+return "Mujhe question samajh aaya: "+q+"\nAbhi main basic offline helper hoon. Is topic ka formula ya concept specific likho, ya Planner Generator use karo. Real AI API abhi connected nahi hai.";
+}
+function clearChat(){$("chat").innerHTML="";}
+function makePlanner(){
+let h=Number($("hours").value),s=$("plannerSubjects").value.trim();
+if(!h||h<=0||!s)return alert("Hours aur subjects likho");
+let arr=s.split(",").map(x=>x.trim()).filter(Boolean);
+let each=h/arr.length;
+$("plannerResult").innerHTML="<h3>Suggested Planner</h3>"+arr.map(x=>`<div class="item"><b>${esc(x)}</b><span>${each.toFixed(1)} hours</span></div>`).join("")+"<small>Har subject ke beech 5-10 minute break rakho.</small>";
+}
+let th=localStorage.getItem("theme");if(th)document.body.style.background=th;
+render();
+</script>
+</body>
+</html>
